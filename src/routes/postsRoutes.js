@@ -3,19 +3,15 @@ import * as postsController from '../controllers/postsController.js';
 
 const router = express.Router();
 
-// Get all posts
-router.get('/', postsController.getAllPosts);
+// Group routes for base path '/'
+router.route('/')
+  .get(postsController.getAllPosts)
+  .post(postsController.createPost);
 
-// Get a single post by ID
-router.get('/:id', postsController.getPostById);
-
-// Create a new post
-router.post('/', postsController.createPost);
-
-// Update a post
-router.put('/:id', postsController.updatePost);
-
-// Delete a post
-router.delete('/:id', postsController.deletePost);
+// Group routes for '/:id' path
+router.route('/:id')
+  .get(postsController.getPostById)
+  .put(postsController.updatePost)
+  .delete(postsController.deletePost);
 
 export default router;
