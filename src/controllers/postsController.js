@@ -1,102 +1,170 @@
-import * as db from '../db/index.js';
+import models from '../models/index.js';
+const { Post } = models;
 
-// Get all posts
+/**
+ * Get all blog posts
+ * Retrieves all posts from the database, ordered by date descending (newest first)
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 export const getAllPosts = async (req, res) => {
   try {
-    const result = await db.query(
-      'SELECT * FROM posts ORDER BY date DESC'
-    );
-    res.status(200).json(result.rows);
+    const posts = await Post.findAll({
+      order: [['date', 'DESC']]
+    });
+    res.status(200).json(posts);
   } catch (error) {
     console.error('❌ Error fetching posts:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Get a single post by ID
+/**
+ * Get a single post by ID
+ * Retrieves a specific post from the database using its primary key
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 export const getPostById = async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await db.query(
-      'SELECT * FROM posts WHERE id = $1',
-      [id]
-    );
+    const post = await Post.findByPk(id);
     
-    if (result.rows.length === 0) {
+    if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
     
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(post);
   } catch (error) {
     console.error('❌ Error fetching post:', error.message);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Create a new post
+/**
+ * Create a new blog post
+ * Validates required fields and saves a new post to the database
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 export const createPost = async (req, res) => {
   try {
     const { title, content, author, cover } = req.body;
     
     // Validate required fields
-    if (!title || !content || !author || !cover) {
-      return res.status(400).json({ error: 'All fields are required (title, content, author, cover)' });
+    const missingFields = [];
+    if (!title) missingFields.push('title');
+    if (!content) missingFields.push('content');
+    if (!author) missingFields.push('author');
+    if (!cover) missingFields.push('cover');
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}` 
+      });
     }
     
-    const result = await db.query(
-      'INSERT INTO posts (title, content, author, cover) VALUES ($1, $2, $3, $4) RETURNING *',
-      [title, content, author, cover]
-    );
+    const post = await Post.create({
+      title,
+      content, 
+      author,
+      cover
+    });
     
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(post);
   } catch (error) {
     console.error('❌ Error creating post:', error.message);
+    
+    // Check for Sequelize validation errors
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({ 
+        error: 'Validation error', 
+        details: error.errors.map(e => e.message)
+      });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Update a post
+/**
+ * Update an existing blog post
+ * Validates required fields and updates post if it exists
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 export const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
     const { title, content, author, cover } = req.body;
     
     // Validate required fields
-    if (!title || !content || !author || !cover) {
-      return res.status(400).json({ error: 'All fields are required (title, content, author, cover)' });
+    const missingFields = [];
+    if (!title) missingFields.push('title');
+    if (!content) missingFields.push('content');
+    if (!author) missingFields.push('author');
+    if (!cover) missingFields.push('cover');
+    
+    if (missingFields.length > 0) {
+      return res.status(400).json({ 
+        error: `Missing required fields: ${missingFields.join(', ')}` 
+      });
     }
     
-    const result = await db.query(
-      'UPDATE posts SET title = $1, content = $2, author = $3, cover = $4 WHERE id = $5 RETURNING *',
-      [title, content, author, cover, id]
-    );
+    const post = await Post.findByPk(id);
     
-    if (result.rows.length === 0) {
+    if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
     
-    res.status(200).json(result.rows[0]);
+    // Update post
+    await post.update({
+      title,
+      content,
+      author,
+      cover
+    });
+    
+    res.status(200).json(post);
   } catch (error) {
     console.error('❌ Error updating post:', error.message);
+    
+    // Check for Sequelize validation errors
+    if (error.name === 'SequelizeValidationError') {
+      return res.status(400).json({ 
+        error: 'Validation error', 
+        details: error.errors.map(e => e.message)
+      });
+    }
+    
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Delete a post
+/**
+ * Delete a blog post
+ * Removes a post from the database if it exists
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ */
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
     
-    const result = await db.query(
-      'DELETE FROM posts WHERE id = $1 RETURNING *',
-      [id]
-    );
+    const post = await Post.findByPk(id);
     
-    if (result.rows.length === 0) {
+    if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
     
-    res.status(200).json({ message: 'Post deleted successfully', deletedPost: result.rows[0] });
+    // Save post data before deletion to return in response
+    const deletedPost = { ...post.toJSON() };
+    await post.destroy();
+    
+    res.status(200).json({ 
+      message: 'Post deleted successfully', 
+      deletedPost 
+    });
   } catch (error) {
     console.error('❌ Error deleting post:', error.message);
     res.status(500).json({ error: 'Internal server error' });
