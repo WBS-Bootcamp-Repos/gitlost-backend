@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "A fullstack travel blog built using **React (frontend)** and **Node.js with PostgreSQL (backend)**. Users can create, update, and explore travel posts with images and descriptions.",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/WBS-Bootcamp-Repos/gitlost-backend#readme",
   "dependencies": {
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "dotenv": "^16.4.7"
