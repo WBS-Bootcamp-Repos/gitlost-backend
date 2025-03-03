@@ -12,7 +12,7 @@ const { Pool } = pkg;
 
 // PGSQL connection pool setup
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Ensure DB_URL is in your .env file
+  connectionString: process.env.DATABASE_URL, // Ensure DB_URL is in .env file
 });
 
 // Helper function for executing queries
