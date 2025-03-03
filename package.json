@@ -1,26 +1,20 @@
 {
-  "name": "backend",
+  "name": "Backend-Fullstack-Blog",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Fullstack-Blog API backend",
+  "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "dev": "node -r dotenv/config --watch index.js",
-    "start": "node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/WBS-Bootcamp-Repos/gitlost-backend.git"
+    "dev": "node -r dotenv/config --watch src/server.js",
+    "start": "node -r dotenv/config src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/WBS-Bootcamp-Repos/gitlost-backend/issues"
-  },
-  "homepage": "https://github.com/WBS-Bootcamp-Repos/gitlost-backend#readme",
   "dependencies": {
-    "express": "^4.21.2"
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "pg": "^8.13.3"
   },
   "devDependencies": {
     "dotenv": "^16.4.7"
