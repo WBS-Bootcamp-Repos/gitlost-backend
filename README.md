@@ -1,4 +1,4 @@
-# Blog API Backend
+# Backend-Fullstack-Blog
 
 A RESTful API backend for a blog application built with Express.js, Sequelize ORM, and PostgreSQL.
 
@@ -28,8 +28,8 @@ A RESTful API backend for a blog application built with Express.js, Sequelize OR
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/blog-api-backend.git
-   cd blog-api-backend
+   git clone https://github.com/WBS-Bootcamp-Repos/gitlost-backend.git
+   cd gitlost-backend
    ```
 
 2. Install dependencies:
@@ -61,6 +61,7 @@ DATABASE_URL='postgresql://john_doe:my_secure_password@ep-cool-forest-123456.us-
 **Important notes about the .env file:**
 - Make sure there are no spaces around the equal signs
 - The .env file must be in the project root, not in the src folder
+- If you're using Windows, make sure the filename is exactly `.env` (not `.env.txt`)
 
 ## Database Configuration
 
@@ -143,7 +144,7 @@ curl -X DELETE http://localhost:3001/posts/1
 ## Project Structure
 
 ```
-blog-api-backend/
+gitlost-backend/
 ├── node_modules/
 ├── src/
 │   ├── config/
